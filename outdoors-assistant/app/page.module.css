@@ -1,0 +1,517 @@
+.main {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  min-height: 100vh;
+  user-select: none;
+}
+
+.center {
+  display: flex;
+  flex-direction: row;
+  justify-content: left;
+  align-items: center;
+  position: relative;
+  margin-left: 5rem;
+  margin-right: 5rem;
+  margin-top: 3rem;
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  width: auto;
+  background-color: var(--brightgreen);
+  color: black;
+  height: 100%;
+  padding-left: 1rem;
+  font-size: 24px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.logo {
+  position: relative;
+  height: 100%;
+  width: auto;
+  margin-left: 1rem;
+}
+
+.map {
+  height: 75vh;
+  width: 65%;
+}
+
+.navBar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  background-color: var(--lightgray);
+  height: 71px;
+  width: 100%;
+  position: fixed;
+  top: 0;
+}
+
+.navItem {
+  padding: 0.75rem;
+  margin-left: 1rem;
+  color: black;
+  font-size: 24px;
+  height: 100%;
+  border-radius: 25px;
+  border-collapse: collapse;
+  align-items: center;
+}
+
+.navItemActive {
+  padding: 0.75rem;
+  margin-left: 1rem;
+  background-color: var(--darkgray);
+  color: var(--brightgreen);
+  font-size: 28px;
+  border-radius: 25px;
+  align-items: center;
+}
+
+.navItems {
+  width: 100%;
+  margin-right: 1rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.navCircleItem {
+  padding-top: 0.45rem;
+  padding-bottom: 0.45rem;
+  padding-left: 0.65rem;
+  padding-right: 0.65rem;
+  margin-left: 1rem;
+  background-color: transparent;
+  color: black;
+  font-size: 24px;
+  height: 100%;
+  border: none;
+  border-radius: 50%;
+  border-collapse: collapse;
+  align-items: center;
+}
+
+.navCircleItemActive {
+  padding-top: 0.45rem;
+  padding-bottom: 0.45rem;
+  padding-left: 0.65rem;
+  padding-right: 0.65rem;
+  margin-left: 1rem;
+  background-color: var(--darkgray);
+  color: var(--brightgreen);
+  font-size: 24px;
+  height: 100%;
+  border: none;
+  border-radius: 50%;
+  border-collapse: collapse;
+  align-items: center;
+}
+
+.navItem:hover, .navCircleItem:hover {background-color: whitesmoke;}
+
+.userNavGroup {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.userName {
+  font-size: 22px;
+  color: black;
+}
+
+.userControls {
+  position: fixed;
+  top: 63px;
+  right: 5px;
+  padding: 2rem;
+  background-color: var(--darkgray);
+  border-radius: 25px;
+  border-collapse: collapse;
+  font-size: 18px;
+  border: 2px solid var(--brightgreen);
+}
+
+.logoutButton {
+  background-color: transparent;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.box {
+  height: 75vh;
+  width: 33%;
+  margin-left: 2.5rem;
+  padding: 1rem;
+  background-color: var(--darkgray);
+  border: 3px solid var(--brightgreen);
+  border-radius: 25px;
+  border-collapse: collapse;
+}
+
+.boxHeader {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 28px;
+  color: whitesmoke;
+  padding-left: 1rem;
+  padding-bottom: 2px;
+}
+
+.list {
+  overflow-y: auto;
+}
+
+.addEventButton {
+  display: flex;
+  flex-direction: row;
+  padding: 10px;
+  align-items: center;
+  background-color: var(--brightgreen);
+  color: whitesmoke;
+  border: none;
+  border-radius: 25px;
+  border-collapse: collapse;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.addEventButton:hover {
+  background-color: green;
+}
+
+.addEventButtonDisabled {
+  display: flex;
+  flex-direction: row;
+  padding: 10px;
+  align-items: center;
+  background-color: var(--lightgray);
+  color: whitesmoke;
+  border: none;
+  border-radius: 25px;
+  border-collapse: collapse;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+
+.spotEntry, .eventEntry {
+  background-color: transparent;
+  border-bottom: 3px solid var(--lightgray);
+  margin-bottom: 1rem;
+  padding: 1rem;
+  border-radius: 25px;
+  border-collapse: collapse;
+  font-size: 18px;
+}
+
+.spotEntry:hover, .eventEntry:hover {
+  background-color:var(--brightgray);
+  color: var(--brightgreen);
+  border-radius: 25px;
+  border-collapse: collapse;
+}
+
+.rating {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.ratingText {
+  margin-left: 5px;
+  font-size: 20px;
+}
+
+.detailsBox {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; 
+  padding: 1rem;
+  margin: 0;
+  height: 100%;
+}
+
+.detailsBoxMain {
+  display: flex;
+  flex-direction: column;
+  font-size: 20px;
+}
+
+.createListingDetails {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15rem;
+  font-size: 20px;
+}
+
+.details {
+  font-size: 20px;
+  padding: 1rem;
+}
+
+.smallTextInput {
+  margin-left: 5px;
+  margin-bottom: 1rem;
+  width: 50%;
+  height: 30px;
+  font-size: 20px;
+  border: none;
+  border-radius: 5px;
+  border-collapse: collapse;
+}
+
+.selectInput {
+  margin-left: 5px;
+  margin-bottom: 1rem;
+  width: 50%;
+  height: 30px;
+  font-size: 20px;
+  border: none;
+  border-radius: 5px;
+  border-collapse: collapse;
+}
+
+.dateTimePicker {
+  margin-left: 5px;
+  margin-bottom: 1rem;
+  width: 50%;
+  height: 30px;
+  font-size: 20px;
+  border: none;
+  border-radius: 5px;
+  border-collapse: collapse;
+}
+
+.controls {
+  padding-left: 2.5rem;
+  padding-right: 2.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-self: last; 
+  height: auto;
+}
+
+.redButton {
+  background-color:lightcoral;
+  font-size: 20px;
+  font-weight: 600;
+  padding: 1rem;
+  border: none;
+  border-radius: 25px;
+  border-collapse: collapse;
+}
+
+.redButton:hover {
+  background-color:red;
+}
+
+.seeReviewsButton {
+  background-color: transparent;
+  font-size: 20px;
+  color: var(--brightgreen);
+  font-weight: 600;
+  padding: 1rem;
+  margin-left: 1rem;
+  border: none;
+  border-radius: 25px;
+  border-collapse: collapse;
+}
+
+.seeReviewsButton:hover {
+  text-decoration: underline;
+}
+
+.greenButton {
+  background-color: var(--brightgreen);
+  font-size: 20px;
+  color: whitesmoke;
+  font-weight: 600;
+  padding: 1rem;
+  margin-left: 1rem;
+  border: none;
+  border-radius: 25px;
+  border-collapse: collapse;
+}
+
+.greenButton:hover {
+  background-color:green;
+}
+
+.greenButtonDisabled {
+  background-color: var(--lightgray);
+  font-size: 20px;
+  color: whitesmoke;
+  font-weight: 600;
+  padding: 1rem;
+  margin-left: 1rem;
+  border: none;
+  border-radius: 25px;
+  border-collapse: collapse;
+}
+
+.starButtonOn {
+  font-size: 42px;
+  background-color: transparent;
+  border: none;
+  color: whitesmoke;
+}
+
+.starButtonOff {
+  font-size: 36px;
+  background-color: transparent;
+  border: none;
+  color: black;
+}
+
+.reviewForm {
+  margin-top: 1rem;
+}
+
+.reviewTextBox, .descriptionTextBox {
+  width: 100%;
+  margin-top: 7px;
+  font-size: 18px;
+  resize:none;
+  border: none;
+  border-radius: 5px;
+  border-collapse: collapse;
+}
+
+.eventHeader {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.boxEventHeader {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  font-size: 28px;
+}
+
+.headcount {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.eventDetails {
+  font-size: 20px;
+}
+
+.eventDetailsSpot {
+  font-size: 20px;
+  background-color: transparent;
+  border: none;
+  margin-bottom: 1rem;
+}
+
+.eventDetailsSpot:hover {
+  font-size: 20px;
+  color: var(--brightgreen);
+  background-color: transparent;
+  border: none;
+}
+
+.login {
+  display: flex;
+  flex-direction: column;
+  margin: auto;
+  width: 25%;
+  height: 60vh;
+  padding: 3rem;
+  background-color: var(--darkgray);
+  border: 3px solid var(--brightgreen);
+  border-radius: 25px;
+  border-collapse: collapse;
+}
+
+.loginForm {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 5%;
+  font-size: 24px;
+}
+
+.loginFormIcon {
+  margin: auto;
+}
+
+.loginFormItem {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin-bottom: 2rem;
+}
+
+.largeTextInput {
+  margin-bottom: 1rem;
+  font-size: 24px;
+  height: 40px;
+  border: none;
+  border-radius: 5px;
+  border-collapse: collapse;
+}
+
+.transparentButton {
+  background-color: transparent;
+  width: 100%;
+  font-size: 20px;
+  color: var(--brightgreen);
+  font-weight: 600;
+  padding: 1rem;
+  margin-top: 5px;
+  border: none;
+  border-radius: 25px;
+  border-collapse: collapse;
+}
+
+.transparentButton:hover {
+  text-decoration: underline;
+}
+
+.lightgrayButton:hover {
+  background-color: lightgray;
+}
+
+.lightgrayButton {
+  background-color: lightgray;
+  font-size: 20px;
+  color: black;
+  font-weight: 600;
+  padding: 1rem;
+  border: none;
+  border-radius: 25px;
+  border-collapse: collapse;
+}
+
+.lightgrayButton:hover {
+  background-color: whitesmoke;
+}
+
+.reviewEntry {
+  margin-top: 1rem;
+  font-size: 18px;
+}
+
+.smallRatingText {
+  font-size: 18px;
+}
+
+.code {
+  font-weight: 700;
+  font-family: var(--font-mono);
+}
