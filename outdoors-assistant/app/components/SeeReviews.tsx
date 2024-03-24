@@ -39,12 +39,12 @@ export default function SeeReviews(props: SeeReviewsProps) {
         <h2 className={styles.boxHeader}>{props.outdoorspot.name}</h2>
         <div className={styles.details}>
           <div className={styles.rating}>
-            <p className={styles.ratingText}>{props.outdoorspot.rating}</p>
+            <p className={styles.ratingText}>{props.outdoorspot.rating?.toFixed(2)}</p>
             {props.outdoorspot.rating !== null ? <IconStarFilled /> : <p>No reviews</p>}
           </div>
           <div className={styles.list}>
             {spotReviews.map((review) => (
-              <div className={styles.reviewEntry}>
+              <div className={styles.reviewEntry} key={review.review_id}>
                 <h3>{review.username}</h3>
                 <div className={styles.rating}>
                   <p className={styles.smallRatingText}>{review.rating}</p>

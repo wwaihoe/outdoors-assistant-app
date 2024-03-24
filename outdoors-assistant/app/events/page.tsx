@@ -4,16 +4,17 @@ import Image from "next/image";
 import styles from "../page.module.css";
 import NavBar from "../components/NavBar";
 import GoogleMaps from "../components/GoogleMaps";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { OutdoorSpot } from "../page";
 import { IconUsers, IconPlus, IconCrown, IconStarFilled } from '@tabler/icons-react';
 import { useAuth } from "../components/AuthProvider";
 
 
 const outdoorPlaces = [
-  {name: "Bishan-Ang Mo Kio Park", lat: 1.3636059844137054, lng: 103.84347570917122, rating: 4.5}, 
-  {name: "Singapore Botanic Gardens", lat: 1.315291338311505, lng: 103.8162004140456, rating: 5.0},
-  {name: "Labrador Nature Reserve", lat: 1.266593151401208, lng: 103.80209914969167, rating: 3.8}
+  {name: "Bishan-Ang Mo Kio Park", lat: 1.3636059844137054, lng: 103.84347570917122, rating: null}, 
+  {name: "Singapore Botanic Gardens", lat: 1.315291338311505, lng: 103.8162004140456, rating: null},
+  {name: "Labrador Nature Reserve", lat: 1.266593151401208, lng: 103.80209914969167, rating: null},
+  {name: "Lakeside Garden", lat: 1.3403288808751195, lng: 103.7245442214574, rating: null} 
 ]
 
 
@@ -34,10 +35,23 @@ export default function Events() {
   const [zoom, setZoom] = useState(12);
   const eventSpotsNames = listedEvents.map(event => event.outdoorSpotName);
   const eventSpots = outdoorPlaces.filter((spot) => eventSpotsNames.includes(spot.name)) as OutdoorSpot[];
+  const [spots, setSpots] = useState<OutdoorSpot[]>(eventSpots);
   const [markers, setMarkers] = useState(eventSpots);
   const [currSpot, setCurrSpot] = useState<OutdoorSpot>(eventSpots[0]);
   const [show, setShow] = useState<"Events" | "Details" | "EventDetails" | "HostEvent">("Events");
   const [currEvent, setCurrEvent] = useState(listedEvents[0])
+
+  useEffect(() => {
+    console.log("Fetching ratings");
+    for (let i = 0; i < spots.length; i++){
+      let initials = spots[i].name.replace(/[^A-Z]+/g, "");
+      fetch(`http://localhost:3003/reviews/${initials}/average`)
+        .then((res) => res.json())
+        .then((data) => {
+          spots[i].rating = data.average_rating;
+        })
+    }
+  }, [show, spots])
 
   const handleClick = (spot: OutdoorSpot) => {
     setCurrSpot(spot);
@@ -64,7 +78,7 @@ export default function Events() {
       <NavBar/>
       <div className={styles.center}> 
         <GoogleMaps lat={coordinates.lat} lng={coordinates.lng} zoom={zoom} markers={markers} handleclick={handleClick} />
-        <EventsList outdoorspots={outdoorPlaces} outdoorevents={listedEvents} show={show} currspot={currSpot} currevent={currEvent} handleclick={handleClick} handleeventclick={handleEventClick} handlebackclick={handleBackClick} handlehosteventclick={handleHostEventClick} />
+        <EventsList outdoorspots={spots} outdoorevents={listedEvents} show={show} currspot={currSpot} currevent={currEvent} handleclick={handleClick} handleeventclick={handleEventClick} handlebackclick={handleBackClick} handlehosteventclick={handleHostEventClick} />
       </div>
     </main>
   );
@@ -160,8 +174,8 @@ function OutdoorSpotDetails(props: OutdoorSpotDetailsProps) {
         <h2 className={styles.boxHeader}>{props.outdoorspot.name}</h2>
         <div className={styles.details}>
           <div className={styles.rating}>
-            <p className={styles.ratingText}>{props.outdoorspot.rating}</p>
-            <IconStarFilled/>
+            <p className={styles.ratingText}>{props.outdoorspot.rating?.toFixed(2)}</p>
+            {props.outdoorspot.rating !== null ? <IconStarFilled /> : <p>No ratings</p>}
           </div>
         </div>
       </div>
@@ -259,7 +273,7 @@ function HostEvent(props: HostEventProps) {
             Outdoor spot:
             <select className={styles.selectInput} value={eventListingSpot?.name || "none"} onChange={handleSpotChange}>
               {props.outdoorspots.map((spot) => (
-                <option value={spot.name}>{spot.name}</option>
+                <option value={spot.name} key={spot.name}>{spot.name}</option>
               ))}
             </select>
           </label>   

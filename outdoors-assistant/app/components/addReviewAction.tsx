@@ -2,7 +2,7 @@
 
 export const submitReview = async (username: string, spotname: string, rating: number, description: string) => {
   const initials = spotname.replace(/[^A-Z]+/g, "");
-  const response = await fetch(`http://localhost:3003/reviews`, {
+  const response = await fetch(`http://reviews-database:3003/reviews`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
