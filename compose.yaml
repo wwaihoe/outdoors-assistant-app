@@ -1,0 +1,43 @@
+networks:
+  bridgenetwork:
+    driver: bridge
+
+services:
+  outdoors-assistant: #front-end
+    build:
+      context: ./outdoors-assistant
+    ports:
+      - 3000:3000
+    environment:
+      NODE_ENV: production
+    networks:
+      - bridgenetwork
+    depends_on:
+      - reviews-database
+
+  reviews-database:
+    build:
+      context: ./reviews-database
+    ports:
+      - 3003:3003
+    networks:
+      - bridgenetwork
+    depends_on:
+      - postgresdb
+
+  postgresdb:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: me
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: reviews
+      PGDATA: /data/postgres
+    ports:
+      - 5432:5432
+    networks:
+      - bridgenetwork
+    volumes:
+      - db:/data/postgres
+  
+volumes:
+  db:
