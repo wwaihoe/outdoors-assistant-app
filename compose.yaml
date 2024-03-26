@@ -15,6 +15,16 @@ services:
     depends_on:
       - reviews-database
 
+  events-database:
+    build:
+      context: ./events-database
+    ports:
+      - 3002:3002
+    networks:
+      - bridgenetwork
+    depends_on:
+      - postgresdb
+
   reviews-database:
     build:
       context: ./reviews-database

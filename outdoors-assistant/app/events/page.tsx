@@ -18,7 +18,7 @@ const outdoorPlaces = [
 ]
 
 
-const listedEvents = [
+const exlistedEvents = [
   {name: "Central meet", capacity: 5, headcount: 3, description: "Meetup in Bishan park.", outdoorSpotName: "Bishan-Ang Mo Kio Park"},
   {name: "Bishan Party", capacity: 10, headcount: 5, description: "Hangout with friends in Bishan park.", outdoorSpotName: "Bishan-Ang Mo Kio Park"}, 
   {name: "Botanic Picnic", capacity: 20, headcount: 20, description: "Local cuisine picnic at Botanic Gardens.", outdoorSpotName: "Singapore Botanic Gardens"},
@@ -33,13 +33,14 @@ const hostedEventsNames = ["Botanic Picnic"]
 export default function Events() {
   const [coordinates, setCoordinates] = useState({lat: 1.34357, lng: 103.84422});
   const [zoom, setZoom] = useState(12);
+  const [show, setShow] = useState<"Events" | "Details" | "EventDetails" | "HostEvent">("Events");
+  const [listedEvents, setListedEvents] = useState<OutdoorEvent[]>([])
+  const [currEvent, setCurrEvent] = useState(listedEvents[0])
   const eventSpotsNames = listedEvents.map(event => event.outdoorSpotName);
   const eventSpots = outdoorPlaces.filter((spot) => eventSpotsNames.includes(spot.name)) as OutdoorSpot[];
   const [spots, setSpots] = useState<OutdoorSpot[]>(eventSpots);
   const [markers, setMarkers] = useState(eventSpots);
   const [currSpot, setCurrSpot] = useState<OutdoorSpot>(eventSpots[0]);
-  const [show, setShow] = useState<"Events" | "Details" | "EventDetails" | "HostEvent">("Events");
-  const [currEvent, setCurrEvent] = useState(listedEvents[0])
 
   useEffect(() => {
     console.log("Fetching ratings");
@@ -51,6 +52,14 @@ export default function Events() {
           spots[i].rating = data.average_rating;
         })
     }
+  }, [show, spots])
+
+  useEffect(() => {
+    fetch(`http://localhost:3002/events`)
+      .then((res) => res.json())
+      .then((data) => {
+        setListedEvents(data);
+      })
   }, [show, spots])
 
   const handleClick = (spot: OutdoorSpot) => {

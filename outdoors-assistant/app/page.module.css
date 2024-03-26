@@ -42,6 +42,10 @@
   width: 65%;
 }
 
+.infoWindowText {
+  color: black;
+}
+
 .navBar {
   display: flex;
   flex-direction: row;
