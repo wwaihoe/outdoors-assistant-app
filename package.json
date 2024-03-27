@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@react-google-maps/api": "^2.19.3",
+    "@types/geojson": "^7946.0.14"
+  }
+}

@@ -4,7 +4,6 @@ import styles from "../page.module.css";
 import { useState } from "react";
 import { OutdoorSpot } from "../page";
 import { useUser } from '@auth0/nextjs-auth0/client';
-import { submitReview } from "./addReviewAction";
 
 interface AddReviewProps {
   outdoorspot: OutdoorSpot;

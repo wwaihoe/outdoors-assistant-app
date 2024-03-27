@@ -4,10 +4,15 @@ import Image from "next/image";
 import styles from "../page.module.css";
 import NavBar from "../components/NavBar";
 import GoogleMaps from "../components/GoogleMaps";
+import HostEvent from "../components/HostEvent";
 import { useState, useEffect } from "react";
 import { OutdoorSpot } from "../page";
 import { IconUsers, IconPlus, IconCrown, IconStarFilled } from '@tabler/icons-react';
-import { useAuth } from "../components/AuthProvider";
+import { useUser } from '@auth0/nextjs-auth0/client';
+import { hostEvent } from "../components/hostEventAction";
+import { cancelEvent } from "../components/cancelEventAction";
+import { joinEvent } from "../components/joinEventAction";
+import { quitEvent } from "../components/quitEventAction";
 
 
 const outdoorPlaces = [
@@ -31,12 +36,13 @@ const hostedEventsNames = ["Botanic Picnic"]
 
 
 export default function Events() {
+  const { user, error, isLoading } = useUser();
   const [coordinates, setCoordinates] = useState({lat: 1.34357, lng: 103.84422});
   const [zoom, setZoom] = useState(12);
   const [show, setShow] = useState<"Events" | "Details" | "EventDetails" | "HostEvent">("Events");
   const [listedEvents, setListedEvents] = useState<OutdoorEvent[]>([])
   const [currEvent, setCurrEvent] = useState(listedEvents[0])
-  const eventSpotsNames = listedEvents.map(event => event.outdoorSpotName);
+  const eventSpotsNames = listedEvents.map(event => event.location_name);
   const eventSpots = outdoorPlaces.filter((spot) => eventSpotsNames.includes(spot.name)) as OutdoorSpot[];
   const [spots, setSpots] = useState<OutdoorSpot[]>(eventSpots);
   const [markers, setMarkers] = useState(eventSpots);
@@ -60,7 +66,7 @@ export default function Events() {
       .then((data) => {
         setListedEvents(data);
       })
-  }, [show, spots])
+  }, [show])
 
   const handleClick = (spot: OutdoorSpot) => {
     setCurrSpot(spot);
@@ -80,25 +86,44 @@ export default function Events() {
   const handleHostEventClick = () => {
     setShow("HostEvent");
   }
-  
+  const handleListEventClick = (name: string, location_name: string, datetime: string, description: string, capacity: number) => {
+    hostEvent(user?.email as string, name, location_name, datetime, description, capacity, 0);
+    setShow("Events");
+  }
+  const handleCancelClick = (name: string) => {
+    cancelEvent(user?.email as string, name);
+    setShow("Events");
+  }
+  const handleJoinClick = (host_username: string, name: string) => {
+    joinEvent(host_username, name, user?.email as string);
+    setShow("Events");
+  }
+  const handleQuitClick = (host_username: string, name: string) => {
+    quitEvent(host_username, name, user?.email as string);
+    setShow("Events");
+  }
 
   return (
     <main className={styles.main}>
       <NavBar/>
       <div className={styles.center}> 
         <GoogleMaps lat={coordinates.lat} lng={coordinates.lng} zoom={zoom} markers={markers} handleclick={handleClick} />
-        <EventsList outdoorspots={spots} outdoorevents={listedEvents} show={show} currspot={currSpot} currevent={currEvent} handleclick={handleClick} handleeventclick={handleEventClick} handlebackclick={handleBackClick} handlehosteventclick={handleHostEventClick} />
+        <EventsList outdoorspots={spots} outdoorevents={listedEvents} show={show} currspot={currSpot} currevent={currEvent} handleclick={handleClick} handleeventclick={handleEventClick} handlebackclick={handleBackClick} handlehosteventclick={handleHostEventClick} handlelisteventclick={handleListEventClick} handlecancelclick={handleCancelClick} handlejoinclick={handleJoinClick} handlequitclick={handleQuitClick}/>
       </div>
     </main>
   );
 }
 
 interface OutdoorEvent {
+  event_id: number;
+  host_username: string;
   name: string;
+  location_name: string;
+  datetime: string;
+  description: string;
   capacity: number;
   headcount: number;
-  description: string;
-  outdoorSpotName: string;
+  participants: string[];
 }
 
 
@@ -112,17 +137,21 @@ interface EventsListProps {
   handleeventclick: (event: OutdoorEvent) => void;
   handlebackclick: () => void; 
   handlehosteventclick: () => void;
+  handlelisteventclick: (name: string, location_name: string, datetime: string, description: string, capacity: number) => void;
+  handlecancelclick: (name: string) => void;
+  handlejoinclick: (host_username: string, name: string) => void;
+  handlequitclick: (host_username: string, name: string) => void;
 }
 
 function EventsList(props: EventsListProps) {
-  const auth = useAuth();
+  const { user, error, isLoading } = useUser();
 
   if (props.show === "Events") {
     return (
       <div className={styles.box}>
         <div className={styles.boxHeader}>
           <h2>Outdoor Events</h2>
-          {auth?.token? <button className={styles.addEventButton} onClick={props.handlehosteventclick}>Host Event<IconPlus color="white" size={32}/></button>: <button className={styles.addEventButtonDisabled} onClick={props.handlehosteventclick} title="You have to be logged in first" disabled>Host Event<IconPlus color="white" size={32}/></button>}
+          {user? <button className={styles.addEventButton} onClick={props.handlehosteventclick}>Host Event<IconPlus color="white" size={32}/></button>: <button className={styles.addEventButtonDisabled} onClick={props.handlehosteventclick} title="You have to be logged in first" disabled>Host Event<IconPlus color="white" size={32}/></button>}
         </div>
         <div className={styles.list}>
           {props.outdoorevents.map((event) => (
@@ -135,7 +164,7 @@ function EventsList(props: EventsListProps) {
               </div>
             </div>
             <div className={styles.eventDetails}>
-              <p>{event.outdoorSpotName}</p>
+              <p>{event.location_name}</p>
             </div>
           </div>
           ))}
@@ -155,7 +184,7 @@ function EventsList(props: EventsListProps) {
   if (props.show === "EventDetails") {
     return (
       <div className={styles.box}>
-        <EventDetails outdoorevent={props.currevent} outdoorspot={props.outdoorspots.find(spot => spot.name === props.currevent.outdoorSpotName) as OutdoorSpot} handleclick={props.handleclick} handlebackclick={props.handlebackclick} ></EventDetails>
+        <EventDetails outdoorevent={props.currevent} outdoorspot={props.outdoorspots.find(spot => spot.name === props.currevent.location_name) as OutdoorSpot} handleclick={props.handleclick} handlebackclick={props.handlebackclick} handlecancelclick={props.handlecancelclick} handlejoinclick={props.handlejoinclick} handlequitclick={props.handlequitclick}></EventDetails>
       </div>
     )
   }
@@ -163,7 +192,7 @@ function EventsList(props: EventsListProps) {
   if (props.show == "HostEvent") {
     return (
       <div className={styles.box}>
-        <HostEvent outdoorspots={props.outdoorspots} handlebackclick={props.handlebackclick} ></HostEvent>
+        <HostEvent outdoorspots={props.outdoorspots} handlebackclick={props.handlebackclick} handlelisteventclick={props.handlelisteventclick}></HostEvent>
       </div>
     )
   }
@@ -202,19 +231,14 @@ interface EventDetailsProps {
   outdoorspot: OutdoorSpot;
   handleclick: (spot: OutdoorSpot)=> void;
   handlebackclick: ()=>void;
+  handlecancelclick: (name: string)=>void;
+  handlejoinclick: (host_username: string, name: string) => void;
+  handlequitclick: (host_username: string, name: string) => void;
 }
 
 function EventDetails(props: EventDetailsProps) {
-  const auth = useAuth();
-  const handleJoinClick = () => {
+  const { user, error, isLoading } = useUser();
 
-  }
-  const handleQuitClick = () => {
-
-  }
-  const handleCancelClick = () => {
-
-  }
   return (
     <div className={styles.detailsBox}>
       <div className={styles.detailsBoxMain}>
@@ -232,81 +256,10 @@ function EventDetails(props: EventDetailsProps) {
       </div>
       
       <div className={styles.controls}>
-        {hostedEventsNames.includes(props.outdoorevent.name) ? <button className={styles.redButton} onClick={handleCancelClick}>Cancel event</button> : joinedEventsNames.includes(props.outdoorevent.name) ? <button className={styles.redButton} onClick={handleQuitClick}>Quit</button> : props.outdoorevent.headcount === props.outdoorevent.capacity ? <button className={styles.greenButtonDisabled} title="Event Full!" disabled>Join</button> : auth?.token ? <button className={styles.greenButton} onClick={handleJoinClick}>Join</button> : <button className={styles.greenButtonDisabled} title="You have to be logged in first" disabled>Join</button>}
+        {hostedEventsNames.includes(props.outdoorevent.name) ? <button className={styles.redButton} onClick={() => props.handlecancelclick(props.outdoorevent.name)}>Cancel event</button> : joinedEventsNames.includes(props.outdoorevent.name) ? <button className={styles.redButton} onClick={() => props.handlequitclick(props.outdoorevent.host_username, props.outdoorevent.name)}>Quit</button> : props.outdoorevent.headcount === props.outdoorevent.capacity ? <button className={styles.greenButtonDisabled} title="Event Full!" disabled>Join</button> : user? <button className={styles.greenButton} onClick={() => props.handlejoinclick(props.outdoorevent.host_username, props.outdoorevent.name)}>Join</button> : <button className={styles.greenButtonDisabled} title="You have to be logged in first" disabled>Join</button>}
         <button className={styles.redButton} onClick={props.handlebackclick}>Back</button>
       </div>
     </div>
   )
 }
 
-
-interface HostEventProps {
-  outdoorspots: OutdoorSpot[];
-  handlebackclick: () => void;
-}
-
-function HostEvent(props: HostEventProps) {
-  const textAreaRows = 10;
-  const currentDate = new Date(); 
-  currentDate.setMinutes(currentDate.getMinutes() - currentDate.getTimezoneOffset());
-  const currentDateString = currentDate.toISOString().slice(0, 16);
-  const [eventListingSpot, setEventListingSpot] = useState<OutdoorSpot | null>(null)
-  const [dateTime, setDatetTime] = useState(currentDateString);
-
-  const handleSpotChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedSpotName = (e.target as HTMLSelectElement).value;
-    const selectedSpot = props.outdoorspots.find(spot => spot.name === selectedSpotName) as OutdoorSpot;
-    setEventListingSpot(selectedSpot); 
-  }
-  const handleDateTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedDateTime = e.target.value;
-    setDatetTime(selectedDateTime); 
-  }
-  const handleCreateListingClick = () => {
-
-  }
-
-
-  return (
-    <div className={styles.detailsBox}>
-      <div className={styles.boxHeader}>
-        <h2>Event Listing</h2>
-      </div>
-      <div className={styles.detailsBoxMain}>
-        <form className={styles.createListingDetails}>
-          <label>
-            Name:
-            <input type="text" name="name" className={styles.smallTextInput}/>
-          </label>
-          <label>
-            Outdoor spot:
-            <select className={styles.selectInput} value={eventListingSpot?.name || "none"} onChange={handleSpotChange}>
-              {props.outdoorspots.map((spot) => (
-                <option value={spot.name} key={spot.name}>{spot.name}</option>
-              ))}
-            </select>
-          </label>   
-          <label htmlFor="event-datetime">Date and time:
-            <input
-              type="datetime-local"
-              id="event-datetime"
-              name="event-datetime"
-              className={styles.dateTimePicker}
-              value={dateTime}
-              min={currentDateString}
-              onChange={handleDateTimeChange}
-              />
-          </label>
-          <div className={styles.descriptionForm}>
-            <p>Description:</p>
-            <textarea id="descriptionText" className={styles.descriptionTextBox} font-size="32px" rows={textAreaRows}></textarea>
-          </div>
-        </form>
-      </div>
-      <div className={styles.controls}>
-        <button className={styles.greenButton} onClick={handleCreateListingClick}>Create Event</button> 
-        <button className={styles.redButton} onClick={props.handlebackclick}>Back</button>
-      </div>
-    </div>
-  )
-}
