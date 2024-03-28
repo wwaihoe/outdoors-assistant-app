@@ -23,16 +23,12 @@ const outdoorPlaces = [
 ]
 
 
-const exlistedEvents = [
+const eglistedEvents = [
   {name: "Central meet", capacity: 5, headcount: 3, description: "Meetup in Bishan park.", outdoorSpotName: "Bishan-Ang Mo Kio Park"},
   {name: "Bishan Party", capacity: 10, headcount: 5, description: "Hangout with friends in Bishan park.", outdoorSpotName: "Bishan-Ang Mo Kio Park"}, 
   {name: "Botanic Picnic", capacity: 20, headcount: 20, description: "Local cuisine picnic at Botanic Gardens.", outdoorSpotName: "Singapore Botanic Gardens"},
   {name: "chill session", capacity: 8, headcount: 8, description: "", outdoorSpotName: "Labrador Nature Reserve"}
 ]
-
-const joinedEventsNames = ["Bishan Party"]
-
-const hostedEventsNames = ["Botanic Picnic"]
 
 
 export default function Events() {
@@ -47,6 +43,8 @@ export default function Events() {
   const [spots, setSpots] = useState<OutdoorSpot[]>(eventSpots);
   const [markers, setMarkers] = useState(eventSpots);
   const [currSpot, setCurrSpot] = useState<OutdoorSpot>(eventSpots[0]);
+  const hostedEventsNames = listedEvents.filter(event => event.host_username === user?.email).map(event => event.name);
+  const joinedEventsNames = listedEvents.filter(event => event.participants.includes(user?.email as string)).map(event => event.name);
 
   useEffect(() => {
     console.log("Fetching ratings");
@@ -108,7 +106,7 @@ export default function Events() {
       <NavBar/>
       <div className={styles.center}> 
         <GoogleMaps lat={coordinates.lat} lng={coordinates.lng} zoom={zoom} markers={markers} handleclick={handleClick} />
-        <EventsList outdoorspots={spots} outdoorevents={listedEvents} show={show} currspot={currSpot} currevent={currEvent} handleclick={handleClick} handleeventclick={handleEventClick} handlebackclick={handleBackClick} handlehosteventclick={handleHostEventClick} handlelisteventclick={handleListEventClick} handlecancelclick={handleCancelClick} handlejoinclick={handleJoinClick} handlequitclick={handleQuitClick}/>
+        <EventsList outdoorspots={spots} outdoorevents={listedEvents} show={show} currspot={currSpot} currevent={currEvent} hostedeventsnames={hostedEventsNames} joinedeventsnames={joinedEventsNames} handleclick={handleClick} handleeventclick={handleEventClick} handlebackclick={handleBackClick} handlehosteventclick={handleHostEventClick} handlelisteventclick={handleListEventClick} handlecancelclick={handleCancelClick} handlejoinclick={handleJoinClick} handlequitclick={handleQuitClick}/>
       </div>
     </main>
   );
@@ -133,6 +131,8 @@ interface EventsListProps {
   show: "Events" | "Details" | "EventDetails" | "HostEvent";
   currevent: OutdoorEvent;
   currspot: OutdoorSpot;
+  hostedeventsnames: string[];
+  joinedeventsnames: string[];
   handleclick: (spot: OutdoorSpot)=>void;
   handleeventclick: (event: OutdoorEvent) => void;
   handlebackclick: () => void; 
@@ -159,7 +159,7 @@ function EventsList(props: EventsListProps) {
             <div className={styles.eventHeader}>
               <h3>{event.name}</h3>
               <div className={styles.headcount}>
-                {(hostedEventsNames.includes(event.name))? <IconCrown color="gold"/> : (joinedEventsNames.includes(event.name))? <IconUsers color="white" fill="rgb(72, 225, 115)"/> : ((event.headcount===event.capacity)? <IconUsers color="lightcoral"/> : <IconUsers color="white"/>)}     
+                {(props.hostedeventsnames.includes(event.name))? <IconCrown color="gold"/> : (props.joinedeventsnames.includes(event.name))? <IconUsers color="white" fill="rgb(72, 225, 115)"/> : ((event.headcount===event.capacity)? <IconUsers color="lightcoral"/> : <IconUsers color="white"/>)}     
                 <p>{event.headcount}/{event.capacity}</p>  
               </div>
             </div>
@@ -184,7 +184,7 @@ function EventsList(props: EventsListProps) {
   if (props.show === "EventDetails") {
     return (
       <div className={styles.box}>
-        <EventDetails outdoorevent={props.currevent} outdoorspot={props.outdoorspots.find(spot => spot.name === props.currevent.location_name) as OutdoorSpot} handleclick={props.handleclick} handlebackclick={props.handlebackclick} handlecancelclick={props.handlecancelclick} handlejoinclick={props.handlejoinclick} handlequitclick={props.handlequitclick}></EventDetails>
+        <EventDetails outdoorevent={props.currevent} outdoorspot={props.outdoorspots.find(spot => spot.name === props.currevent.location_name) as OutdoorSpot} hostedeventsnames={props.hostedeventsnames} joinedeventsnames={props.joinedeventsnames} handleclick={props.handleclick} handlebackclick={props.handlebackclick} handlecancelclick={props.handlecancelclick} handlejoinclick={props.handlejoinclick} handlequitclick={props.handlequitclick}></EventDetails>
       </div>
     )
   }
@@ -229,6 +229,8 @@ function OutdoorSpotDetails(props: OutdoorSpotDetailsProps) {
 interface EventDetailsProps {
   outdoorevent: OutdoorEvent;
   outdoorspot: OutdoorSpot;
+  hostedeventsnames: string[];
+  joinedeventsnames: string[];
   handleclick: (spot: OutdoorSpot)=> void;
   handlebackclick: ()=>void;
   handlecancelclick: (name: string)=>void;
@@ -245,7 +247,7 @@ function EventDetails(props: EventDetailsProps) {
         <div className={styles.boxEventHeader}>
           <h3>{props.outdoorevent.name}</h3>
           <div className={styles.headcount}>
-            {(hostedEventsNames.includes(props.outdoorevent.name))? <IconCrown color="gold" size={32}/> :(props.outdoorevent.headcount===props.outdoorevent.capacity)? <IconUsers color="lightcoral" size={32}/> : <IconUsers color="white" size={32}/>}    
+            {(props.hostedeventsnames.includes(props.outdoorevent.name))? <IconCrown color="gold" size={32}/> :(props.outdoorevent.headcount===props.outdoorevent.capacity)? <IconUsers color="lightcoral" size={32}/> : <IconUsers color="white" size={32}/>}    
             <p>{props.outdoorevent.headcount}/{props.outdoorevent.capacity}</p>  
           </div>
         </div>
@@ -256,7 +258,7 @@ function EventDetails(props: EventDetailsProps) {
       </div>
       
       <div className={styles.controls}>
-        {hostedEventsNames.includes(props.outdoorevent.name) ? <button className={styles.redButton} onClick={() => props.handlecancelclick(props.outdoorevent.name)}>Cancel event</button> : joinedEventsNames.includes(props.outdoorevent.name) ? <button className={styles.redButton} onClick={() => props.handlequitclick(props.outdoorevent.host_username, props.outdoorevent.name)}>Quit</button> : props.outdoorevent.headcount === props.outdoorevent.capacity ? <button className={styles.greenButtonDisabled} title="Event Full!" disabled>Join</button> : user? <button className={styles.greenButton} onClick={() => props.handlejoinclick(props.outdoorevent.host_username, props.outdoorevent.name)}>Join</button> : <button className={styles.greenButtonDisabled} title="You have to be logged in first" disabled>Join</button>}
+        {props.hostedeventsnames.includes(props.outdoorevent.name) ? <button className={styles.redButton} onClick={() => props.handlecancelclick(props.outdoorevent.name)}>Cancel event</button> : props.joinedeventsnames.includes(props.outdoorevent.name) ? <button className={styles.redButton} onClick={() => props.handlequitclick(props.outdoorevent.host_username, props.outdoorevent.name)}>Quit</button> : props.outdoorevent.headcount === props.outdoorevent.capacity ? <button className={styles.greenButtonDisabled} title="Event Full!" disabled>Join</button> : user? <button className={styles.greenButton} onClick={() => props.handlejoinclick(props.outdoorevent.host_username, props.outdoorevent.name)}>Join</button> : <button className={styles.greenButtonDisabled} title="You have to be logged in first" disabled>Join</button>}
         <button className={styles.redButton} onClick={props.handlebackclick}>Back</button>
       </div>
     </div>
