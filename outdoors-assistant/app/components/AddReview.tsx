@@ -13,7 +13,7 @@ interface AddReviewProps {
 
 export default function AddReview(props: AddReviewProps) {
   const [rating, setRating] = useState(0);
-  const textAreaRows = 20;
+  const textAreaRows = 10;
   const { user, error, isLoading } = useUser();
 
   return (
