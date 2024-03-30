@@ -13,15 +13,7 @@ import { hostEvent } from "../components/hostEventAction";
 import { cancelEvent } from "../components/cancelEventAction";
 import { joinEvent } from "../components/joinEventAction";
 import { quitEvent } from "../components/quitEventAction";
-
-
-const outdoorPlaces = [
-  {name: "Bishan-Ang Mo Kio Park", lat: 1.3636059844137054, lng: 103.84347570917122, rating: null}, 
-  {name: "Singapore Botanic Gardens", lat: 1.315291338311505, lng: 103.8162004140456, rating: null},
-  {name: "Labrador Nature Reserve", lat: 1.266593151401208, lng: 103.80209914969167, rating: null},
-  {name: "Lakeside Garden", lat: 1.3403288808751195, lng: 103.7245442214574, rating: null} 
-]
-
+import { outdoorPlaces } from "../../public/data/OutdoorPlaces";
 
 const eglistedEvents = [
   {name: "Central meet", capacity: 5, headcount: 3, description: "Meetup in Bishan park.", outdoorSpotName: "Bishan-Ang Mo Kio Park"},
@@ -38,13 +30,12 @@ export default function Events() {
   const [show, setShow] = useState<"Events" | "Details" | "EventDetails" | "HostEvent">("Events");
   const [listedEvents, setListedEvents] = useState<OutdoorEvent[]>([])
   const [currEvent, setCurrEvent] = useState(listedEvents[0])
-  const eventSpotsNames = listedEvents.map(event => event.location_name);
-  const eventSpots = outdoorPlaces.filter((spot) => eventSpotsNames.includes(spot.name)) as OutdoorSpot[];
-  const [spots, setSpots] = useState<OutdoorSpot[]>(eventSpots);
-  const [markers, setMarkers] = useState(eventSpots);
-  const [currSpot, setCurrSpot] = useState<OutdoorSpot>(eventSpots[0]);
+  const [spots, setSpots] = useState<OutdoorSpot[]>(outdoorPlaces);
+  const [markers, setMarkers] = useState<OutdoorSpot[]>([]);
+  const [currSpot, setCurrSpot] = useState<OutdoorSpot>(spots[0]);
   const hostedEventsNames = listedEvents.filter(event => event.host_username === user?.email).map(event => event.name);
-  const joinedEventsNames = listedEvents.filter(event => event.participants.includes(user?.email as string)).map(event => event.name);
+  const joinedEventsNames = listedEvents.filter(event => event.participants.includes(user?.email as string)).map(event => event.name);  
+  const [dengueWarning, setDengueWarning] = useState<number>(0);
 
   useEffect(() => {
     console.log("Fetching ratings");
@@ -66,6 +57,12 @@ export default function Events() {
       })
   }, [show])
 
+  useEffect(() => {
+    const eventSpotsNames = listedEvents.map(event => event.location_name);
+    const eventSpots = spots.filter((spot) => eventSpotsNames.includes(spot.name)) as OutdoorSpot[];
+    setMarkers(eventSpots);
+  }, [listedEvents])
+
   const handleClick = (spot: OutdoorSpot) => {
     setCurrSpot(spot);
     setShow("Details");
@@ -85,6 +82,7 @@ export default function Events() {
     setShow("HostEvent");
   }
   const handleListEventClick = (name: string, location_name: string, datetime: string, description: string, capacity: number) => {
+    console.log(location_name);
     hostEvent(user?.email as string, name, location_name, datetime, description, capacity, 0);
     setShow("Events");
   }
@@ -105,8 +103,8 @@ export default function Events() {
     <main className={styles.main}>
       <NavBar/>
       <div className={styles.center}> 
-        <GoogleMaps lat={coordinates.lat} lng={coordinates.lng} zoom={zoom} markers={markers} handleclick={handleClick} />
-        <EventsList outdoorspots={spots} outdoorevents={listedEvents} show={show} currspot={currSpot} currevent={currEvent} hostedeventsnames={hostedEventsNames} joinedeventsnames={joinedEventsNames} handleclick={handleClick} handleeventclick={handleEventClick} handlebackclick={handleBackClick} handlehosteventclick={handleHostEventClick} handlelisteventclick={handleListEventClick} handlecancelclick={handleCancelClick} handlejoinclick={handleJoinClick} handlequitclick={handleQuitClick}/>
+        <GoogleMaps lat={coordinates.lat} lng={coordinates.lng} zoom={zoom} handleclick={handleClick} markers={markers} setdenguewarning={setDengueWarning}/>
+        <EventsList outdoorspots={spots} outdoorevents={listedEvents} show={show} currspot={currSpot} denguewarning={dengueWarning} currevent={currEvent} hostedeventsnames={hostedEventsNames} joinedeventsnames={joinedEventsNames} handleclick={handleClick} handleeventclick={handleEventClick} handlebackclick={handleBackClick} handlehosteventclick={handleHostEventClick} handlelisteventclick={handleListEventClick} handlecancelclick={handleCancelClick} handlejoinclick={handleJoinClick} handlequitclick={handleQuitClick}/>
       </div>
     </main>
   );
@@ -131,6 +129,7 @@ interface EventsListProps {
   show: "Events" | "Details" | "EventDetails" | "HostEvent";
   currevent: OutdoorEvent;
   currspot: OutdoorSpot;
+  denguewarning: number;
   hostedeventsnames: string[];
   joinedeventsnames: string[];
   handleclick: (spot: OutdoorSpot)=>void;
@@ -145,6 +144,25 @@ interface EventsListProps {
 
 function EventsList(props: EventsListProps) {
   const { user, error, isLoading } = useUser();
+  const parse_timestamp = (timestamp_str: string) => {
+    // Create a Date object from the ISO 8601 timestamp
+    const dateObj = new Date(timestamp_str);
+  
+    // Extract date components
+    const year = dateObj.getFullYear();
+    const month = ('0' + (dateObj.getMonth() + 1)).slice(-2); // Pad month with zero
+    const day = ('0' + dateObj.getDate()).slice(-2); // Pad day with zero
+  
+    // Extract time components
+    const hours = ('0' + dateObj.getHours()).slice(-2); // Pad hours with zero
+    const minutes = ('0' + dateObj.getMinutes()).slice(-2); 
+  
+    // Format the output
+    const date = `${year}/${month}/${day}`;
+    const time = `${hours}:${minutes}`;
+  
+    return { date, time };
+  }
 
   if (props.show === "Events") {
     return (
@@ -165,6 +183,7 @@ function EventsList(props: EventsListProps) {
             </div>
             <div className={styles.eventDetails}>
               <p>{event.location_name}</p>
+              <p>{parse_timestamp(event.datetime).date} {parse_timestamp(event.datetime).time}</p>
             </div>
           </div>
           ))}
@@ -176,7 +195,7 @@ function EventsList(props: EventsListProps) {
   if (props.show === "Details") {
     return (
       <div className={styles.box}>
-        <OutdoorSpotDetails outdoorspot={props.currspot} handlebackclick={props.handlebackclick} ></OutdoorSpotDetails>
+        <OutdoorSpotDetails outdoorspot={props.currspot} denguewarning={props.denguewarning} handlebackclick={props.handlebackclick} ></OutdoorSpotDetails>
       </div>
     )  
   }
@@ -201,6 +220,7 @@ function EventsList(props: EventsListProps) {
 
 interface OutdoorSpotDetailsProps {
   outdoorspot: OutdoorSpot;
+  denguewarning: number;
   handlebackclick: ()=>void;    
 }
 
@@ -215,6 +235,8 @@ function OutdoorSpotDetails(props: OutdoorSpotDetailsProps) {
             <p className={styles.ratingText}>{props.outdoorspot.rating?.toFixed(2)}</p>
             {props.outdoorspot.rating !== null ? <IconStarFilled /> : <p>No ratings</p>}
           </div>
+          <p style={{color: "lightgray", fontSize: "16px", marginBottom: "2rem"}}>Click on the green marker to view nearby food places</p>
+          <p>{props.denguewarning > 0 ? props.denguewarning + ' Dengue clusters nearby' : 'No dengue clusters nearby!'}</p>
         </div>
       </div>
       
@@ -240,6 +262,25 @@ interface EventDetailsProps {
 
 function EventDetails(props: EventDetailsProps) {
   const { user, error, isLoading } = useUser();
+  const parse_timestamp = (timestamp_str: string) => {
+    // Create a Date object from the ISO 8601 timestamp
+    const dateObj = new Date(timestamp_str);
+  
+    // Extract date components
+    const year = dateObj.getFullYear();
+    const month = ('0' + (dateObj.getMonth() + 1)).slice(-2); // Pad month with zero
+    const day = ('0' + dateObj.getDate()).slice(-2); // Pad day with zero
+  
+    // Extract time components
+    const hours = ('0' + dateObj.getHours()).slice(-2); // Pad hours with zero
+    const minutes = ('0' + dateObj.getMinutes()).slice(-2); 
+  
+    // Format the output
+    const date = `${year}/${month}/${day}`;
+    const time = `${hours}:${minutes}`;
+  
+    return { date, time };
+  }
 
   return (
     <div className={styles.detailsBox}>
@@ -247,12 +288,13 @@ function EventDetails(props: EventDetailsProps) {
         <div className={styles.boxEventHeader}>
           <h3>{props.outdoorevent.name}</h3>
           <div className={styles.headcount}>
-            {(props.hostedeventsnames.includes(props.outdoorevent.name))? <IconCrown color="gold" size={32}/> :(props.outdoorevent.headcount===props.outdoorevent.capacity)? <IconUsers color="lightcoral" size={32}/> : <IconUsers color="white" size={32}/>}    
+            {(props.hostedeventsnames.includes(props.outdoorevent.name))? <IconCrown color="gold" size={32}/> : (props.joinedeventsnames.includes(props.outdoorevent.name))? <IconUsers color="white" fill="rgb(72, 225, 115)" size={32}/> : ((props.outdoorevent.headcount === props.outdoorevent.capacity)? <IconUsers color="lightcoral" size={32}/> : <IconUsers color="white" size={32}/>)}     
             <p>{props.outdoorevent.headcount}/{props.outdoorevent.capacity}</p>  
           </div>
         </div>
         <div className={styles.eventDetails}>
           <button className={styles.eventDetailsSpot} onClick={() => props.handleclick(props.outdoorspot)}>{props.outdoorspot.name}</button>
+          <p style={{ marginBottom: "1rem" }}>{parse_timestamp(props.outdoorevent.datetime).date} {parse_timestamp(props.outdoorevent.datetime).time}</p>
           <p>{props.outdoorevent.description}</p>
         </div>
       </div>

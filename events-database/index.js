@@ -16,11 +16,11 @@ pool.query(`
         host_username VARCHAR(255),
         name VARCHAR(255),
         location_name VARCHAR(255),
-        datetime DATETIME,
+        datetime TIMESTAMP,
         description VARCHAR(1024),
         capacity INT,
         headcount INT,
-        participants VARCHAR(255)[] SET DEFAULT '{}'
+        participants VARCHAR(255)[] DEFAULT '{}'
     )
 `, (err, result) => {
     if (err) {

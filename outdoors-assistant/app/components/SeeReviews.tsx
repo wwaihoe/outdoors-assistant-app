@@ -31,7 +31,7 @@ export default function SeeReviews(props: SeeReviewsProps) {
       .then((data) => {
         setSpotReviews(data as Review[]); 
       })
-  }, [])
+  }, [initials])
   
   return (
     <div className={styles.detailsBox}>

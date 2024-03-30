@@ -4,11 +4,11 @@ const Pool = require('pg').Pool;
 // PLEASE CHANGE THIS TO YOUR OWN DATABASE CONNECTION DETAILS //
 
 const pool = new Pool({
-    user: "me",
-    password: "password",
+    user: "postgres",
+    password: "postgres",
     host: "postgresdb",
     port: 5432,
-    database : "reviews"
+    database : "outdoors-assistant"
 });
 
 module.exports = pool;

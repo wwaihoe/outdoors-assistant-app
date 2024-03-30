@@ -9,13 +9,8 @@ import SeeReviews from "./components/SeeReviews";
 import AddReview from "./components/AddReview";
 import { submitReview } from "./components/addReviewAction";
 import { useUser } from '@auth0/nextjs-auth0/client';
+import { outdoorPlaces } from "../public/data/OutdoorPlaces";
 
-const outdoorPlaces = [
-  {name: "Bishan-Ang Mo Kio Park", lat: 1.3636059844137054, lng: 103.84347570917122, rating: null}, 
-  {name: "Singapore Botanic Gardens", lat: 1.315291338311505, lng: 103.8162004140456, rating: null},
-  {name: "Labrador Nature Reserve", lat: 1.266593151401208, lng: 103.80209914969167, rating: null},
-  {name: "Lakeside Garden", lat: 1.3403288808751195, lng: 103.7245442214574, rating: null} 
-]
 
 export default function Home() {
   const { user, error, isLoading } = useUser();
@@ -24,6 +19,7 @@ export default function Home() {
   const [show, setShow] = useState<"Home" | "Details" | "Review" | "SeeReviews">("Home");
   const [spots, setSpots] = useState<OutdoorSpot[]>(outdoorPlaces);
   const [currSpot, setCurrSpot] = useState<OutdoorSpot>(outdoorPlaces[0]);
+  const [dengueWarning, setDengueWarning] = useState<number>(0);
 
   useEffect(() => {
     console.log("Fetching ratings");
@@ -63,8 +59,8 @@ export default function Home() {
     <main className={styles.main}>
       <NavBar/>
       <div className={styles.center}> 
-        <GoogleMaps lat={coordinates.lat} lng={coordinates.lng} zoom={zoom} handleclick={handleClick} markers={spots} />
-        <OutdoorSpotsList outdoorspots={spots} show={show} currspot={currSpot} handleclick={handleClick} handlebackclick={handleBackClick} handlereviewclick={handleReviewClick} handleseereviewsclick={handleSeeReviewsClick} handlesubmitreviewclick={handleSubmitReviewClick}/>
+        <GoogleMaps lat={coordinates.lat} lng={coordinates.lng} zoom={zoom} handleclick={handleClick} markers={spots} setdenguewarning={setDengueWarning}/>
+        <OutdoorSpotsList outdoorspots={spots} show={show} currspot={currSpot} denguewarning={dengueWarning} handleclick={handleClick} handlebackclick={handleBackClick} handlereviewclick={handleReviewClick} handleseereviewsclick={handleSeeReviewsClick} handlesubmitreviewclick={handleSubmitReviewClick}/>
       </div>
     </main>
   );
@@ -82,6 +78,7 @@ interface OutdoorSpotsListProps {
   outdoorspots: OutdoorSpot[];
   show: "Home" | "Details" | "Review" | "SeeReviews";
   currspot: OutdoorSpot;
+  denguewarning: number;
   handleclick: (spot:OutdoorSpot)=>void; 
   handlereviewclick: (spot:OutdoorSpot)=>void;
   handlebackclick: ()=>void;    
@@ -114,7 +111,7 @@ function OutdoorSpotsList(props: OutdoorSpotsListProps) {
   if (props.show === "Details") {
     return (
       <div className={styles.box}>
-        <OutdoorSpotDetails outdoorspot={props.currspot} handlebackclick={props.handlebackclick} handleseereviewsclick={props.handleseereviewsclick}></OutdoorSpotDetails>
+        <OutdoorSpotDetails outdoorspot={props.currspot} denguewarning={props.denguewarning} handlebackclick={props.handlebackclick} handleseereviewsclick={props.handleseereviewsclick}></OutdoorSpotDetails>
       </div>
     )  
   }
@@ -139,6 +136,7 @@ function OutdoorSpotsList(props: OutdoorSpotsListProps) {
 
 interface OutdoorSpotDetailsProps {
   outdoorspot: OutdoorSpot;
+  denguewarning: number;
   handlebackclick: ()=>void;
   handleseereviewsclick: ()=>void;
 }
@@ -155,6 +153,8 @@ function OutdoorSpotDetails(props: OutdoorSpotDetailsProps) {
             {props.outdoorspot.rating !== null ? <IconStarFilled /> : <p>No ratings</p>}
             <button className={styles.seeReviewsButton} onClick={props.handleseereviewsclick} >see reviews</button>
           </div>
+          <p style={{color: "lightgray", fontSize: "16px", marginBottom: "2rem"}}>Click on the green marker to view nearby food places</p>
+          <p>{props.denguewarning > 0 ? props.denguewarning + ' Dengue clusters nearby' : 'No dengue clusters nearby!'}</p>
         </div>
       </div>
       

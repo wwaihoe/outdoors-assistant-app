@@ -15,7 +15,7 @@ export default function HostEvent(props: HostEventProps) {
   currentDate.setMinutes(currentDate.getMinutes() - currentDate.getTimezoneOffset());
   const currentDateString = currentDate.toISOString().slice(0, 16);
   const [name, setName] = useState("");
-  const [eventListingSpot, setEventListingSpot] = useState("none")
+  const [eventListingSpot, setEventListingSpot] = useState("")
   const [dateTime, setDatetTime] = useState(currentDateString);
   const [capacity, setCapacity] = useState(0);
   const [description, setDescription] = useState("");
@@ -25,8 +25,7 @@ export default function HostEvent(props: HostEventProps) {
   }
   const handleSpotChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedSpotName = (e.target as HTMLSelectElement).value;
-    const selectedSpot = props.outdoorspots.find(spot => spot.name === selectedSpotName) as OutdoorSpot;
-    setEventListingSpot(selectedSpot.name); 
+    setEventListingSpot(selectedSpotName); 
   }
   const handleDateTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedDateTime = e.target.value;

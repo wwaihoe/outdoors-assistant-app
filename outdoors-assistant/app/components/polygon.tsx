@@ -91,7 +91,7 @@ function usePolygon(props: PolygonProps) {
     return () => {
       polygon.setMap(null);
     };
-  }, [map]);
+  }, [map, polygon]);
 
   // attach and re-attach event-handlers when any of the properties change
   useEffect(() => {
@@ -124,10 +124,10 @@ function usePolygon(props: PolygonProps) {
 /**
  * Component to render a Google Maps polygon on a map
  */
-export const Polygon = forwardRef((props: PolygonProps, ref: PolygonRef) => {
+export const Polygon = forwardRef(function PolygonComponent(props: PolygonProps, ref: PolygonRef) {
   const polygon = usePolygon(props);
 
-  useImperativeHandle(ref, () => polygon, []);
+  useImperativeHandle(ref, () => polygon, [polygon]);
 
   return null;
 });

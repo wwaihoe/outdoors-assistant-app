@@ -174,7 +174,8 @@
 }
 
 .list {
-  overflow-y: auto;
+  overflow: auto;
+  height: 93%;
 }
 
 .addEventButton {

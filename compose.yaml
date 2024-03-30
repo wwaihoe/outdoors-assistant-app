@@ -23,7 +23,8 @@ services:
     networks:
       - bridgenetwork
     depends_on:
-      - postgresdb
+      postgresdb:
+        condition: service_healthy
 
   reviews-database:
     build:
@@ -33,14 +34,18 @@ services:
     networks:
       - bridgenetwork
     depends_on:
-      - postgresdb
+      postgresdb:
+        condition: service_healthy
 
   postgresdb:
     image: postgres:latest
+    restart: always
     environment:
-      POSTGRES_USER: me
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: reviews
+      PGUSER: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_HOST: postgresdb
+      POSTGRES_DB: outdoors-assistant
       PGDATA: /data/postgres
     ports:
       - 5432:5432
@@ -48,6 +53,11 @@ services:
       - bridgenetwork
     volumes:
       - db:/data/postgres
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
   
 volumes:
   db:
