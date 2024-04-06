@@ -27,10 +27,19 @@ export default function SeeReviews(props: SeeReviewsProps) {
   const [spotReviews, setSpotReviews] = useState<Review[]>([]);
   useEffect(() => {
     fetch(`http://localhost:3003/reviews/${initials}`)
-      .then((res) => res.json())
-      .then((data) => {
-        setSpotReviews(data as Review[]); 
+      .then((res) => {
+      if (!res.ok) {
+        alert("Failed to fetch reviews");
+      }
+      return res.json();
       })
+      .then((data) => {
+      setSpotReviews(data as Review[]); 
+      })
+      .catch((error) => {
+      console.error(error);
+      alert("Failed to fetch reviews");
+      });
   }, [initials])
   
   return (

@@ -25,11 +25,21 @@ export default function Home() {
     console.log("Fetching ratings");
     for (let i = 0; i < spots.length; i++){
       let initials = spots[i].name.replace(/[^A-Z]+/g, "");
-      fetch(`http://localhost:3003/reviews/${initials}/average`)
-        .then((res) => res.json())
-        .then((data) => {
-          spots[i].rating = data.average_rating;
-        })
+      try {
+        fetch(`http://localhost:3003/reviews/${initials}/average`)
+          .then((res) => {
+            if (!res.ok) {
+              alert("Failed to fetch ratings");
+            }
+            return res.json();
+            })
+          .then((data) => {
+            spots[i].rating = data.average_rating;
+          })
+      } catch (error) {
+        console.error(error);
+        alert("Failed to fetch ratings");
+      }
     }
   }, [show, spots])
 

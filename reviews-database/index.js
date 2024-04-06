@@ -43,6 +43,8 @@ app.post('/reviews', async (req, res) => {
 
         // Sending the inserted review back as a response
         res.json(newReview.rows[0]);
+        console.log("New review added:")
+        console.log(newReview.rows[0]);
 
     } catch (err) {
         console.error(err.message);
@@ -137,6 +139,8 @@ app.put('/reviews/:username/:location_name', async (req, res) => {
         );
 
         res.json("Review was updated");
+        console.log("Review updated:")
+        console.log(updateReview);
 
     }
     catch (err) {
@@ -155,6 +159,8 @@ app.delete('/reviews/:username/:location_name', async (req, res) => {
         const deleteReview = await pool.query("DELETE FROM reviews WHERE username = $1 AND location_name = $2", [user_id, location_name]);
         
         res.json("Review was deleted");
+        console.log("Review deleted:")
+        console.log(deleteReview);
     
     }
     catch (err) {

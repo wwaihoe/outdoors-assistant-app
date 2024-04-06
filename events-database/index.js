@@ -47,6 +47,8 @@ app.post('/events', async (req, res) => {
 
         // Sending the inserted event back as a response
         res.json(newEvent.rows[0]);
+        console.log("New event added:")
+        console.log(newEvent.rows[0]);
 
     } catch (err) {
         console.error(err.message);
@@ -108,6 +110,8 @@ app.put('/events/join/:host_username/:name', async (req, res) => {
         );
 
         res.json("Event was updated");
+        console.log("Event updated:")
+        console.log(updateEvent);
 
     }
     catch (err) {
@@ -135,6 +139,8 @@ app.put('/events/quit/:host_username/:name', async (req, res) => {
         );
 
         res.json("Event was updated");
+        console.log("Event updated:")
+        console.log(updateEvent);
 
     }
     catch (err) {
@@ -153,6 +159,8 @@ app.delete('/events/:host_username/:name', async (req, res) => {
         const deleteEvent = await pool.query("DELETE FROM events WHERE host_username = $1 AND name = $2", [host_username, name]);
         
         res.json("Event was deleted");
+        console.log("Event deleted:")
+        console.log(deleteEvent);
     
     }
     catch (err) {

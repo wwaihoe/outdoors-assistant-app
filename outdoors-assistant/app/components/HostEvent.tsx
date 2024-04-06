@@ -62,8 +62,8 @@ export default function HostEvent(props: HostEventProps) {
           <label>
             Capacity:
             <select className={styles.selectInput} value={capacity} onChange={handleCapacityChange}>
-              {Array.from(Array(50).keys()).map((number) => (
-                <option value={number} key={number}>{number}</option>
+              {Array.from(Array(49).keys()).map((number) => (
+                <option value={number+1} key={number+1}>{number+1}</option>
               ))}
             </select>
           </label> 
@@ -85,7 +85,7 @@ export default function HostEvent(props: HostEventProps) {
         </form>
       </div>
       <div className={styles.controls}>
-        <button className={styles.greenButton} onClick={() => props.handlelisteventclick(name, eventListingSpot, dateTime, description, capacity)}>Create Event</button> 
+        {(name === "" || eventListingSpot === "" || capacity === 0) ? <button className={styles.greenButtonDisabled} title="Please fill in event details" disabled>Create Event</button> : <button className={styles.greenButton} onClick={() => props.handlelisteventclick(name, eventListingSpot, dateTime, description, capacity)}>Create Event</button>} 
         <button className={styles.redButton} onClick={props.handlebackclick}>Back</button>
       </div>
     </div>

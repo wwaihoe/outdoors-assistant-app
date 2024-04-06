@@ -44,6 +44,10 @@ export default function GoogleMapsFoodPlaces(props: GoogleMapsFoodPlacesProps) {
         }
         props.setfoodplaces(foodPlacesDetails);
       }
+      if (status !== window.google.maps.places.PlacesServiceStatus.OK) {
+        console.error("Failed to get food places");
+        alert("Failed to get food places");
+      }
     });
   }, [placesService, props.lat, props.lng, props.showdetails]);
 
