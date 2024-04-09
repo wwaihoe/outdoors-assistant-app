@@ -256,8 +256,7 @@ function OutdoorSpotDetails(props: OutdoorSpotDetailsProps) {
           <p style={{color: "lightgray", fontSize: "16px", marginBottom: "2rem"}}>Click on the green marker to view nearby food places</p>
           <p>{props.denguewarning > 0 ? props.denguewarning + ' Dengue clusters nearby' : 'No dengue clusters nearby!'}</p>
         </div>
-      </div>
-      
+      </div>      
       <div className={styles.controls}>
         <button className={styles.redButton} onClick={props.handlebackclick}>Back</button>
       </div>
