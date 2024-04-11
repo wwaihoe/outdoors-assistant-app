@@ -1,6 +1,5 @@
 "use client"
 
-import Image from "next/image";
 import styles from "../page.module.css";
 import NavBar from "../components/NavBar";
 import GoogleMaps from "../components/GoogleMaps";
@@ -14,13 +13,6 @@ import { cancelEvent } from "../components/cancelEventAction";
 import { joinEvent } from "../components/joinEventAction";
 import { quitEvent } from "../components/quitEventAction";
 import { outdoorPlaces } from "../../public/data/OutdoorPlaces";
-
-const eglistedEvents = [
-  {name: "Central meet", capacity: 5, headcount: 3, description: "Meetup in Bishan park.", outdoorSpotName: "Bishan-Ang Mo Kio Park"},
-  {name: "Bishan Party", capacity: 10, headcount: 5, description: "Hangout with friends in Bishan park.", outdoorSpotName: "Bishan-Ang Mo Kio Park"}, 
-  {name: "Botanic Picnic", capacity: 20, headcount: 20, description: "Local cuisine picnic at Botanic Gardens.", outdoorSpotName: "Singapore Botanic Gardens"},
-  {name: "chill session", capacity: 8, headcount: 8, description: "", outdoorSpotName: "Labrador Nature Reserve"}
-]
 
 
 export default function Events() {
