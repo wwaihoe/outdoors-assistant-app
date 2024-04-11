@@ -15,7 +15,7 @@ import { outdoorPlaces } from "../public/data/OutdoorPlaces";
 export default function Home() {
   const { user, error, isLoading } = useUser();
   const [coordinates, setCoordinates] = useState({lat: 1.34357, lng: 103.84422});
-  const [zoom, setZoom] = useState(11.5);
+  const [zoom, setZoom] = useState(11.7);
   const [show, setShow] = useState<"Home" | "Details" | "Review" | "SeeReviews">("Home");
   const [spots, setSpots] = useState<OutdoorSpot[]>(outdoorPlaces);
   const [currSpot, setCurrSpot] = useState<OutdoorSpot>(outdoorPlaces[0]);
@@ -37,6 +37,10 @@ export default function Home() {
         .then((data) => {
           newSpots[i].rating = data.average_rating;
           console.log(`${i}: ${data.average_rating}`);
+          return newSpots;
+        })
+        .then(() => {
+          setSpots(newSpots);
         })
         .catch((error) => {
           console.error(error);
@@ -44,8 +48,6 @@ export default function Home() {
           return;
         });
     }
-    setSpots(newSpots);
-    console.log(spots);
   }, [show])
 
   const handleClick = (spot: OutdoorSpot) => {
@@ -54,11 +56,11 @@ export default function Home() {
     setCoordinates({lat: spot.lat, lng: spot.lng});
     setTimeout(() => {
       setShow("Details");
-    }, 1000)
+    }, 500)
   }
   const handleBackClick = () => {
     setShow("Home");
-    setZoom(11.5);
+    setZoom(11.7);
     setCoordinates({lat: 1.34357, lng: 103.84422});
   }
   const handleReviewClick = (spot: OutdoorSpot) => {
@@ -70,8 +72,8 @@ export default function Home() {
   const handleSubmitReviewClick = (rating: number, description: string) => {
     submitReview(user?.email as string, currSpot.name, rating, description);
     setTimeout(() => {
-      setShow("Home");
-    }, 1000)
+      handleBackClick();
+    }, 500)
   }
 
   return (
@@ -118,7 +120,7 @@ function OutdoorSpotsList(props: OutdoorSpotsListProps) {
               <h3>{spot.name}</h3>
               <div className={styles.rating}>
                 <p className={styles.ratingText}>{spot.rating?.toFixed(2)}</p>
-                {spot.rating !== null ? <IconStarFilled fill="gold" /> : <p>No ratings</p>}
+                {spot.rating !== null ? <span className={styles.starRating}>&#9733;</span> : <p>No ratings</p>}
               </div>
             </div>
           ))}
@@ -169,10 +171,9 @@ function OutdoorSpotDetails(props: OutdoorSpotDetailsProps) {
         <div className={styles.details}>
           <div className={styles.rating}>
             <p className={styles.ratingText}>{props.outdoorspot.rating?.toFixed(2)}</p>
-            {props.outdoorspot.rating !== null ? <IconStarFilled fill="gold" /> : <p>No ratings</p>}
+            {props.outdoorspot.rating !== null ? <span className={styles.starRating}>&#9733;</span> : <p>No ratings</p>}
             <button className={styles.seeReviewsButton} onClick={props.handleseereviewsclick} >see reviews</button>
           </div>
-          <p style={{color: "lightgray", fontSize: "16px", marginBottom: "2rem"}}>Click on the green marker to view nearby food places</p>
           <p>{props.denguewarning > 0 ? props.denguewarning + ' Dengue clusters nearby' : 'No dengue clusters nearby!'}</p>
         </div>
       </div>

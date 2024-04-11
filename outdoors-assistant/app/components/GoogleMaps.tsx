@@ -28,6 +28,9 @@ export default function GoogleMaps(props: GoogleMapsProps) {
   const [currInfo, setCurrInfo] = useState<string | null>(null);
   const [showDetails, setShowDetails] = useState<boolean>(false);
   const [foodPlaces, setFoodPlaces] = useState<google.maps.places.PlaceResult[]>([]);
+  const [showPlaceInfo, setShowPlaceInfo] = useState<boolean>(false);
+  const [currPlaceId, setCurrPlaceId] = useState<string>("");
+  const [placeDetails, setPlaceDetails] = useState<google.maps.places.PlaceResult | null>(null);
   const parseDescription = (description: string) => {
     // Parse HTML description and extract relevant information
     const parser = new DOMParser();
@@ -44,6 +47,16 @@ export default function GoogleMaps(props: GoogleMapsProps) {
     });
     return nameValue;
   };
+  const handleMarkerClick = (place: google.maps.places.PlaceResult) => {
+    setCurrPlaceId(place.place_id as string);
+    setShowPlaceInfo(true);
+  };
+  const handleMarkerClose = () => {
+    setShowPlaceInfo(false);
+    setCurrPlaceId("");
+    setPlaceDetails(null);
+  };
+
   useEffect(() => {
     if (props.zoom > 15) {
       setShowDetails(true);
@@ -79,7 +92,7 @@ export default function GoogleMaps(props: GoogleMapsProps) {
   return (
     <div className={styles.map}>
       <APIProvider apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY as string}>
-        <GoogleMapsFoodPlaces setfoodplaces={setFoodPlaces} showdetails={showDetails} lat={props.lat} lng={props.lng}/>
+        <GoogleMapsFoodPlaces setfoodplaces={setFoodPlaces} setplacedetails={setPlaceDetails} showdetails={showDetails} showplaceinfo={showPlaceInfo} currplaceid={currPlaceId} lat={props.lat} lng={props.lng}/>
         <Map
           id={"defaultMap"}
           mapId={"defaultMap"}
@@ -123,30 +136,26 @@ export default function GoogleMaps(props: GoogleMapsProps) {
             ))
           }
           {(FacilitiesGEOJSON as FeatureCollection).features.map((facility: any) => (
-            (currInfo === facility.properties.Name) && <InfoWindow key={facility.properties.Name} position={{lat: facility.geometry.coordinates[1], lng: facility.geometry.coordinates[0]}}>
+            (currInfo === facility.properties.Name) && <InfoWindow key={facility.properties.Name} position={{lat: facility.geometry.coordinates[1], lng: facility.geometry.coordinates[0]}} onCloseClick={() => setCurrInfo(null)}>
               <p className={styles.infoWindowText}>{parseDescription(facility.properties.Description)}</p>
             </InfoWindow>
           ))}
           {foodPlaces.map((place: google.maps.places.PlaceResult) => (
-            showDetails && <AdvancedMarker key={place.name} position={{lat: place.geometry?.location?.lat() as number, lng: place.geometry?.location?.lng() as number}} onClick={() => setCurrInfo(place.name as string)}>
+            showDetails && <AdvancedMarker key={place.name} position={{lat: place.geometry?.location?.lat() as number, lng: place.geometry?.location?.lng() as number}} onClick={() => handleMarkerClick(place)}>
               <Pin background={'#f58d42'} glyphColor={'#ffffff'} borderColor={'#ffffff'} />
             </AdvancedMarker>
-          ))}
-          {foodPlaces.map((place: google.maps.places.PlaceResult) => (
-            (currInfo === place.name) && <InfoWindow key={place.name} position={{lat: place.geometry?.location?.lat() as number, lng: place.geometry?.location?.lng() as number}}>
-              <div className={styles.infoWindowText}>
-                <h3>{place.name}</h3>
-                <p>Rating: {place.rating}</p>
-                <p>Price level: {place.price_level}</p>
-                <p>{place.formatted_address}</p>
-                <p><a href={place.url}>View on Google Maps</a></p>
-              </div>
-            </InfoWindow>
-          ))}
+          ))} 
+          (showPlaceInfo && placeDetails) && <InfoWindow key={placeDetails?.name} position={{lat: placeDetails?.geometry?.location?.lat() as number, lng: placeDetails?.geometry?.location?.lng() as number}} onCloseClick={handleMarkerClose}>
+            <div className={styles.infoWindowText}>
+              <h3>{placeDetails?.name}</h3>
+              <p>Rating: {placeDetails?.rating}</p>
+              <p>Price level: {placeDetails?.price_level}</p>
+              <p>{placeDetails?.formatted_address}</p>
+              <p><a href={placeDetails?.url}>View on Google Maps</a></p>
+            </div>
+          </InfoWindow>
         </Map>        
       </APIProvider>
     </div>
   )
 }
-
-//facility.properties.Description.split("<td>")[2].split("<\/td>")[0]

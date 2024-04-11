@@ -257,7 +257,7 @@
 .createListingDetails {
   display: flex;
   flex-direction: column;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
   font-size: 20px;
 }
 
@@ -367,18 +367,27 @@
   border-collapse: collapse;
 }
 
+.starRating {
+  align-items: center;
+  font-size: 24px;
+  padding-bottom: 5px;
+  background-color: transparent;
+  border: none;
+  color: gold;
+}
+
 .starButtonOn {
   font-size: 42px;
   background-color: transparent;
   border: none;
-  color: whitesmoke;
+  color: gold;
 }
 
 .starButtonOff {
-  font-size: 36px;
+  font-size: 40px;
   background-color: transparent;
   border: none;
-  color: black;
+  color: gray;
 }
 
 .reviewForm {

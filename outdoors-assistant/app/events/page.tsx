@@ -18,7 +18,7 @@ import { outdoorPlaces } from "../../public/data/OutdoorPlaces";
 export default function Events() {
   const { user, error, isLoading } = useUser();
   const [coordinates, setCoordinates] = useState({lat: 1.34357, lng: 103.84422});
-  const [zoom, setZoom] = useState(11.5);
+  const [zoom, setZoom] = useState(11.7);
   const [show, setShow] = useState<"Events" | "Details" | "EventDetails" | "HostEvent">("Events");
   const [listedEvents, setListedEvents] = useState<OutdoorEvent[]>([])
   const [currEvent, setCurrEvent] = useState(listedEvents[0])
@@ -31,32 +31,31 @@ export default function Events() {
 
   useEffect(() => {
     console.log("Fetching ratings");
-    let newRatings = [] as number[];
+    const newSpots = [...spots];
     for (let i = 0; i < spots.length; i++){
       let initials = spots[i].name.replace(/[^A-Z]+/g, "");
       fetch(`http://localhost:3003/reviews/${initials}/average`)
         .then((res) => {
           if (!res.ok) {
             alert("Failed to fetch ratings");
+            return;
           }
           return res.json();
           })
         .then((data) => {
-          newRatings.push(data.average_rating);
+          newSpots[i].rating = data.average_rating;
+          console.log(`${i}: ${data.average_rating}`);
+          return newSpots;
+        })
+        .then(() => {
+          setSpots(newSpots);
         })
         .catch((error) => {
           console.error(error);
           alert("Failed to fetch ratings");
+          return;
         });
     }
-    setSpots(spots.map((spot, index) => {
-      if (index < newRatings.length) {
-        return {...spot, rating: newRatings[index]};
-      }
-      else {
-        return spot;
-      }
-    }));
   }, [show])
 
   useEffect(() => {
@@ -94,28 +93,35 @@ export default function Events() {
   }
   const handleBackClick = () => {
     setShow("Events");
-    setZoom(11.5);
+    setZoom(11.7);
     setCoordinates({lat: 1.34357, lng: 103.84422});
   }
   const handleHostEventClick = () => {
     setShow("HostEvent");
   }
   const handleListEventClick = (name: string, location_name: string, datetime: string, description: string, capacity: number) => {
-    console.log(location_name);
     hostEvent(user?.email as string, name, location_name, datetime, description, capacity, 0);
-    setShow("Events");
+    setTimeout(() => {
+      handleBackClick();
+    }, 500)    
   }
   const handleCancelClick = (name: string) => {
     cancelEvent(user?.email as string, name);
-    setShow("Events");
+    setTimeout(() => {
+      handleBackClick();
+    }, 500)    
   }
   const handleJoinClick = (host_username: string, name: string) => {
     joinEvent(host_username, name, user?.email as string);
-    setShow("Events");
+    setTimeout(() => {
+      handleBackClick();
+    }, 500)    
   }
   const handleQuitClick = (host_username: string, name: string) => {
     quitEvent(host_username, name, user?.email as string);
-    setShow("Events");
+    setTimeout(() => {
+      handleBackClick();
+    }, 500)    
   }
 
   return (
@@ -252,9 +258,8 @@ function OutdoorSpotDetails(props: OutdoorSpotDetailsProps) {
         <div className={styles.details}>
           <div className={styles.rating}>
             <p className={styles.ratingText}>{props.outdoorspot.rating?.toFixed(2)}</p>
-            {props.outdoorspot.rating !== null ? <IconStarFilled fill="gold" /> : <p>No ratings</p>}
+            {props.outdoorspot.rating !== null ? <span className={styles.starRating}>&#9733;</span> : <p>No ratings</p>}
           </div>
-          <p style={{color: "lightgray", fontSize: "16px", marginBottom: "2rem"}}>Click on the green marker to view nearby food places</p>
           <p>{props.denguewarning > 0 ? props.denguewarning + ' Dengue clusters nearby' : 'No dengue clusters nearby!'}</p>
         </div>
       </div>      
