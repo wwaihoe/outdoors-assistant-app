@@ -49,28 +49,30 @@ export default function GoogleMaps(props: GoogleMapsProps) {
       setShowDetails(true);
       let count = 0;
       (DengueClustersGEOJSON as FeatureCollection).features.map((cluster: any) => {
-        let polyLat = 0;
-        let polyLng = 0;
         const coordinates = cluster.geometry.coordinates[0];
-        for (let i = 0; i < coordinates.length; i++) {
-          polyLat += coordinates[i][1];
-          polyLng += coordinates[i][0];
-        }
-        polyLat /= coordinates.length;
-        polyLng /= coordinates.length;
-        const distance = google.maps.geometry.spherical.computeDistanceBetween(
-          new google.maps.LatLng(props.lat as number, props.lng as number),
-          new google.maps.LatLng(polyLat, polyLng)
-        );
-        if (distance <= 1000) {
-          count++;
+        if (coordinates.length > 0) {
+          let polyLat = 0;
+          let polyLng = 0;
+          for (let i = 0; i < coordinates.length; i++) {
+            polyLat += coordinates[i][1];
+            polyLng += coordinates[i][0];
+          }
+          polyLat /= coordinates.length;
+          polyLng /= coordinates.length;
+          const distance = google.maps.geometry.spherical.computeDistanceBetween(
+            new google.maps.LatLng(props.lat as number, props.lng as number),
+            new google.maps.LatLng(polyLat, polyLng)
+          );
+          if (distance <= 1000) {
+            count++;
+          }
         }
       });
       props.setdenguewarning(count);
       }
     else {
       setShowDetails(false);
-      setFoodPlaces([]);
+      props.setdenguewarning(0);
     }
   }, [props.zoom]);
 
