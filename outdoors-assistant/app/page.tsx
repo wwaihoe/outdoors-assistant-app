@@ -15,7 +15,7 @@ import { outdoorPlaces } from "../public/data/OutdoorPlaces";
 export default function Home() {
   const { user, error, isLoading } = useUser();
   const [coordinates, setCoordinates] = useState({lat: 1.34357, lng: 103.84422});
-  const [zoom, setZoom] = useState(12);
+  const [zoom, setZoom] = useState(11.5);
   const [show, setShow] = useState<"Home" | "Details" | "Review" | "SeeReviews">("Home");
   const [spots, setSpots] = useState<OutdoorSpot[]>(outdoorPlaces);
   const [currSpot, setCurrSpot] = useState<OutdoorSpot>(outdoorPlaces[0]);
@@ -23,35 +23,42 @@ export default function Home() {
 
   useEffect(() => {
     console.log("Fetching ratings");
+    const newSpots = [...spots];
     for (let i = 0; i < spots.length; i++){
       let initials = spots[i].name.replace(/[^A-Z]+/g, "");
-      try {
-        fetch(`http://localhost:3003/reviews/${initials}/average`)
-          .then((res) => {
-            if (!res.ok) {
-              alert("Failed to fetch ratings");
-            }
-            return res.json();
-            })
-          .then((data) => {
-            spots[i].rating = data.average_rating;
+      fetch(`http://localhost:3003/reviews/${initials}/average`)
+        .then((res) => {
+          if (!res.ok) {
+            alert("Failed to fetch ratings");
+            return;
+          }
+          return res.json();
           })
-      } catch (error) {
-        console.error(error);
-        alert("Failed to fetch ratings");
-      }
+        .then((data) => {
+          newSpots[i].rating = data.average_rating;
+          console.log(`${i}: ${data.average_rating}`);
+        })
+        .catch((error) => {
+          console.error(error);
+          alert("Failed to fetch ratings");
+          return;
+        });
     }
-  }, [show, spots])
+    setSpots(newSpots);
+    console.log(spots);
+  }, [show])
 
   const handleClick = (spot: OutdoorSpot) => {
     setCurrSpot(spot);
-    setShow("Details");
     setZoom(15.5);
     setCoordinates({lat: spot.lat, lng: spot.lng});
+    setTimeout(() => {
+      setShow("Details");
+    }, 1000)
   }
   const handleBackClick = () => {
     setShow("Home");
-    setZoom(12);
+    setZoom(11.5);
     setCoordinates({lat: 1.34357, lng: 103.84422});
   }
   const handleReviewClick = (spot: OutdoorSpot) => {
@@ -62,7 +69,9 @@ export default function Home() {
   }
   const handleSubmitReviewClick = (rating: number, description: string) => {
     submitReview(user?.email as string, currSpot.name, rating, description);
-    setShow("Home");
+    setTimeout(() => {
+      setShow("Home");
+    }, 1000)
   }
 
   return (
@@ -109,7 +118,7 @@ function OutdoorSpotsList(props: OutdoorSpotsListProps) {
               <h3>{spot.name}</h3>
               <div className={styles.rating}>
                 <p className={styles.ratingText}>{spot.rating?.toFixed(2)}</p>
-                {spot.rating !== null ? <IconStarFilled /> : <p>No ratings</p>}
+                {spot.rating !== null ? <IconStarFilled fill="gold" /> : <p>No ratings</p>}
               </div>
             </div>
           ))}
@@ -160,7 +169,7 @@ function OutdoorSpotDetails(props: OutdoorSpotDetailsProps) {
         <div className={styles.details}>
           <div className={styles.rating}>
             <p className={styles.ratingText}>{props.outdoorspot.rating?.toFixed(2)}</p>
-            {props.outdoorspot.rating !== null ? <IconStarFilled /> : <p>No ratings</p>}
+            {props.outdoorspot.rating !== null ? <IconStarFilled fill="gold" /> : <p>No ratings</p>}
             <button className={styles.seeReviewsButton} onClick={props.handleseereviewsclick} >see reviews</button>
           </div>
           <p style={{color: "lightgray", fontSize: "16px", marginBottom: "2rem"}}>Click on the green marker to view nearby food places</p>

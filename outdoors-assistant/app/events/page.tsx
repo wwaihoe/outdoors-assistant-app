@@ -18,7 +18,7 @@ import { outdoorPlaces } from "../../public/data/OutdoorPlaces";
 export default function Events() {
   const { user, error, isLoading } = useUser();
   const [coordinates, setCoordinates] = useState({lat: 1.34357, lng: 103.84422});
-  const [zoom, setZoom] = useState(12);
+  const [zoom, setZoom] = useState(11.5);
   const [show, setShow] = useState<"Events" | "Details" | "EventDetails" | "HostEvent">("Events");
   const [listedEvents, setListedEvents] = useState<OutdoorEvent[]>([])
   const [currEvent, setCurrEvent] = useState(listedEvents[0])
@@ -31,6 +31,7 @@ export default function Events() {
 
   useEffect(() => {
     console.log("Fetching ratings");
+    let newRatings = [] as number[];
     for (let i = 0; i < spots.length; i++){
       let initials = spots[i].name.replace(/[^A-Z]+/g, "");
       fetch(`http://localhost:3003/reviews/${initials}/average`)
@@ -41,29 +42,37 @@ export default function Events() {
           return res.json();
           })
         .then((data) => {
-          spots[i].rating = data.average_rating;
+          newRatings.push(data.average_rating);
         })
         .catch((error) => {
           console.error(error);
           alert("Failed to fetch ratings");
         });
     }
-  }, [show, spots])
+    setSpots(spots.map((spot, index) => {
+      if (index < newRatings.length) {
+        return {...spot, rating: newRatings[index]};
+      }
+      else {
+        return spot;
+      }
+    }));
+  }, [show])
 
   useEffect(() => {
     fetch(`http://localhost:3002/events`)
       .then((res) => {
-      if (!res.ok) {
-        alert("Failed to fetch events");
-      }
-      return res.json();
-      })
+        if (!res.ok) {
+          alert("Failed to fetch events");
+        }
+        return res.json();
+        })
       .then((data) => {
-      setListedEvents(data);
+        setListedEvents(data);
       })
       .catch((error) => {
-      console.error(error);
-      alert("Failed to fetch events");
+        console.error(error);
+        alert("Failed to fetch events");
       });
   }, [show])
 
@@ -85,7 +94,7 @@ export default function Events() {
   }
   const handleBackClick = () => {
     setShow("Events");
-    setZoom(12);
+    setZoom(11.5);
     setCoordinates({lat: 1.34357, lng: 103.84422});
   }
   const handleHostEventClick = () => {
@@ -243,7 +252,7 @@ function OutdoorSpotDetails(props: OutdoorSpotDetailsProps) {
         <div className={styles.details}>
           <div className={styles.rating}>
             <p className={styles.ratingText}>{props.outdoorspot.rating?.toFixed(2)}</p>
-            {props.outdoorspot.rating !== null ? <IconStarFilled /> : <p>No ratings</p>}
+            {props.outdoorspot.rating !== null ? <IconStarFilled fill="gold" /> : <p>No ratings</p>}
           </div>
           <p style={{color: "lightgray", fontSize: "16px", marginBottom: "2rem"}}>Click on the green marker to view nearby food places</p>
           <p>{props.denguewarning > 0 ? props.denguewarning + ' Dengue clusters nearby' : 'No dengue clusters nearby!'}</p>
