@@ -72,7 +72,7 @@ export default function GoogleMaps(props: GoogleMapsProps) {
       }
     else {
       setShowDetails(false);
-      setFoodPlaces([]);
+      props.setdenguewarning(0);
     }
   }, [props.zoom]);
 
