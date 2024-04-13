@@ -36,7 +36,6 @@ export default function Home() {
           })
         .then((data) => {
           newSpots[i].rating = data.average_rating;
-          console.log(`${i}: ${data.average_rating}`);
           return newSpots;
         })
         .then(() => {
