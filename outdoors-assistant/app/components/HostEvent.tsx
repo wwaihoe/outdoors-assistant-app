@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { OutdoorSpot } from "../page";
 import styles from "../page.module.css";
+const moment = require("moment");
 
 
 interface HostEventProps {
@@ -54,6 +55,7 @@ export default function HostEvent(props: HostEventProps) {
           <label>
             Outdoor spot:
             <select className={styles.selectInput} value={eventListingSpot} onChange={handleSpotChange}>
+              <option value=""></option>
               {props.outdoorspots.map((spot) => (
                 <option value={spot.name} key={spot.name}>{spot.name}</option>
               ))}
@@ -62,7 +64,8 @@ export default function HostEvent(props: HostEventProps) {
           <label>
             Capacity:
             <select className={styles.selectInput} value={capacity} onChange={handleCapacityChange}>
-              {Array.from(Array(49).keys()).map((number) => (
+              <option value={0}>0</option>
+              {Array.from(Array(50).keys()).map((number) => (
                 <option value={number+1} key={number+1}>{number+1}</option>
               ))}
             </select>
@@ -85,7 +88,7 @@ export default function HostEvent(props: HostEventProps) {
         </form>
       </div>
       <div className={styles.controls}>
-        {(name === "" || eventListingSpot === "" || capacity === 0) ? <button className={styles.greenButtonDisabled} title="Please fill in event details" disabled>Create Event</button> : <button className={styles.greenButton} onClick={() => props.handlelisteventclick(name, eventListingSpot, dateTime, description, capacity)}>Create Event</button>} 
+        {(name === "" || eventListingSpot === "" || capacity === 0) ? <button className={styles.greenButtonDisabled} title="Please fill in event details" disabled>Create Event</button> : ((moment(dateTime) < moment())? <button className={styles.greenButtonDisabled} title="Please choose a valid date" disabled>Create Event</button>: <button className={styles.greenButton} onClick={() => props.handlelisteventclick(name, eventListingSpot, dateTime, description, capacity)}>Create Event</button>)} 
         <button className={styles.redButton} onClick={props.handlebackclick}>Back</button>
       </div>
     </div>
