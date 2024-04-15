@@ -39,7 +39,9 @@ export default function Home() {
           return newSpots;
         })
         .then(() => {
-          setSpots(newSpots);
+          if (i === spots.length - 1){
+            setSpots(newSpots);
+          }
         })
         .catch((error) => {
           console.error(error);

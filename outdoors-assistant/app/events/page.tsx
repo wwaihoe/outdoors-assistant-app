@@ -44,11 +44,12 @@ export default function Events() {
           })
         .then((data) => {
           newSpots[i].rating = data.average_rating;
-          console.log(`${i}: ${data.average_rating}`);
           return newSpots;
         })
         .then(() => {
-          setSpots(newSpots);
+          if (i === spots.length - 1){
+            setSpots(newSpots);
+          }
         })
         .catch((error) => {
           console.error(error);
