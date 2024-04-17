@@ -39,7 +39,7 @@ export default function AddReview(props: AddReviewProps) {
             </div>
             <div className={styles.reviewForm}>
               <h3>Enter your review here:</h3>
-              <textarea id="reviewText" className={styles.reviewTextBox} font-size="32px" rows={textAreaRows}></textarea>
+              <textarea id="reviewText" className={styles.reviewTextBox} style={{ fontSize: "32px" }} rows={textAreaRows} maxLength={1000}></textarea>
             </div>
           </div>
         </div>
