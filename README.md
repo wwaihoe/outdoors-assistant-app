@@ -18,5 +18,6 @@
 ![image](https://github.com/user-attachments/assets/c281fc75-8484-47d2-97d5-b57d159b0af0)
 **Host your own outdoor event for other users to join**
 
+## How to run
 1. Update `.env.local` file in outdoors-assistant directory.
 2. `docker compose up --build` to run.
