@@ -1,4 +1,4 @@
-# Outdoors Assistant\
+# Outdoors Assistant
 
 ![Screenshot 2024-08-27 181852](https://github.com/user-attachments/assets/e584df9a-597a-4e68-8ffc-1f554ff8b9d8)
 **Find outdoor spots for your next outdoor event**\
@@ -17,6 +17,6 @@
 \
 ![image](https://github.com/user-attachments/assets/c281fc75-8484-47d2-97d5-b57d159b0af0)
 **Host your own outdoor event for other users to join**\
-\
+
 1. Update `.env.local` file in outdoors-assistant directory.
 2. `docker compose up --build` to run.
