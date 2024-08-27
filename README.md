@@ -22,7 +22,7 @@
 1. Update `.env.local` file in outdoors-assistant directory.
 2. `docker compose up --build` to run.
 
-### Frameworks and Technologies
+## Frameworks and Technologies
 Node.js, Express.js, Next.js, PostgreSQL, Docker, Auth0
-### Data Sources
+## Data Sources
 Google Maps, Data.gov.sg
